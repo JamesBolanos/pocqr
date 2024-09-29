@@ -42,7 +42,7 @@
       </div>
       
       <div class="mb-6">
-        <label for="date" class="block text-gray-700 font-medium mb-2">Fecha (YYMMDD, 6 caracteres):</label>
+        <label for="date" class="block text-gray-700 font-medium mb-2">Fecha de Expiracion (YYMMDD, 6 caracteres):</label>
         <input id="date" type="text" bind:value={date} maxlength="6" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
       </div>
       
