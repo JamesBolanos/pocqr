@@ -1,7 +1,7 @@
 import QRCode from 'qrcode';
 
 export async function POST({ request }) {
-  const { gtin, lotNumber, date } = await request.json();
+  const { domain, gtin, lotNumber, date } = await request.json();
 
   // Validate GTIN length
   if (gtin.length !== 13) {
@@ -9,7 +9,7 @@ export async function POST({ request }) {
   }
 
   // Generate the data string following GS1 standards
-  const qrData = `01${gtin}10${lotNumber}17${date}`; // Changed AI for date to 17
+  const qrData = `${domain}01/${gtin}/10/${lotNumber}/17/${date}`; // Changed AI for date to 17
 
   // Create a dynamic filename based on the input values
   const filename = `GTIN_${gtin}_Lot_${lotNumber}_Date_${date}.png`;

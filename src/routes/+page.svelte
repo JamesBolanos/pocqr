@@ -1,5 +1,6 @@
 <script>
-  let gtin = '';
+  let domain ='https://resolver-st.gs1.org/';
+  let gtin = '7430042900007';
   let lotNumber = '';
   let date = '';
 
@@ -9,7 +10,7 @@
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ gtin, lotNumber, date }),
+      body: JSON.stringify({domain, gtin, lotNumber, date }),
     });
 
     const blob = await response.blob();
@@ -26,11 +27,15 @@
 
 <main class="min-h-screen bg-gray-100 flex items-center justify-center">
   <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
-    <h1 class="text-2xl font-bold mb-6 text-center">Generar Código QR</h1>
+    <h1 class="text-2xl font-bold mb-6 text-center">Generar Código QR Powered by Digital Link</h1>
     <h2 class="mb-6 text-center">formato png</h2>
     
     <form on:submit|preventDefault={generateQRCode}>
       <div class="grid grid-cols-1 sm:grid-cols-1 gap-6 mb-6">
+        <div>
+          <label for="domain" class="block text-gray-700 font-medium mb-2">Domain name (default gs1 stage resolver):</label>
+          <input id="domain" type="text" bind:value={domain} maxlength="30" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
+        </div>
         <div>
           <label for="gtin" class="block text-gray-700 font-medium mb-2">GTIN (13 caracteres):</label>
           <input id="gtin" type="text" bind:value={gtin} maxlength="13" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
