@@ -2,8 +2,8 @@
 <div class="flex flex-col min-h-screen bg-gray-100">
     <!-- Header -->
     <header class="bg-blue-600 text-white py-6 shadow-md">
-      <h1 class="text-3xl font-bold text-center">Proof of Concept</h1>
-      <p class="text-center text-lg mt-2">Improving Warranty Registration and Inventory Management</p>
+      <h1 class="text-3xl font-bold text-center">Demo</h1>
+      <p class="text-center text-lg mt-2">Manejo de Garantias utilizando Codigos QR</p>
     </header>
   
     <!-- Main Content Area -->

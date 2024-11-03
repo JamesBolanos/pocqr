@@ -3,6 +3,7 @@
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
     import { get } from 'svelte/store';
+    import confetti from 'canvas-confetti';
   
     // Access URL parameters
     let gtin = get(page).params.gtin;
@@ -25,7 +26,7 @@
           goto(`/product-info/01/${gtin}/21/${serial}`);
         }
       } catch (error) {
-        console.error('Error checking warranty existence:', error);
+        console.error('Error al buscar garantias existentes', error);
       }
     });
   
@@ -39,15 +40,26 @@
         });
   
         if (response.ok) {
-          alert('Warranty registered successfully!');
+          // Trigger confetti animation
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+          alert('Garantia registrada correctamente!');
         } else {
-          alert('Failed to register warranty.');
+          alert('Fallo al registrar la garantia.');
         }
       } catch (error) {
         console.error('Request failed:', error);
         alert('An error occurred while saving warranty.');
       }
+
+      //Send the customer to the main page
+      goto(`/`);
     }
+
+    
   </script>
   
   <div class="max-w-lg mx-auto p-8">
@@ -84,7 +96,7 @@
       </div>
   
       <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Register Warranty
+        Registrar Garantia
       </button>
     </form>
   </div>

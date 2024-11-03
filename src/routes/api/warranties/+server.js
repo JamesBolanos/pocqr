@@ -35,7 +35,7 @@ export async function GET({ url }) {
 
   if (gtin && serial) {
     // Check if a specific warranty exists based on gtin and serial
-    console.log("somebody is querying a specific item");
+    
     return new Promise((resolve, reject) => {
       db.get(
         `SELECT * FROM warranties WHERE gtin = ? AND serial = ?`,
