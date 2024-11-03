@@ -1,7 +1,7 @@
 <script>
 
   import GoBackButton from '$lib/GoBackButton.svelte';
-  let domain ='https://resolver-st.gs1.org/';
+  let domain ='https://poqr.vercel.app/';
   let gtin = '7430042900007';
   let serialNumber = '';
   

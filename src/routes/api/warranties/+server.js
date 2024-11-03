@@ -2,7 +2,30 @@
 import sqlite3 from 'sqlite3';
 import { json } from '@sveltejs/kit';
 
-const db = new sqlite3.Database('warranty.db');
+// Set the database path based on the environment
+const dbPath = process.env.IN_MEMORY_DB === 'true' ? ':memory:' : './warranty.db';
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Error opening database:', err);
+  } else {
+    console.log(`Connected to the SQLite database at ${dbPath === ':memory:' ? 'in-memory' : dbPath}`);
+  }
+});
+
+
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS warranties (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    gtin TEXT,
+    serial TEXT,
+    cliente TEXT,
+    fechaDeCompra TEXT,
+    customer_email TEXT,
+    warranty_registered INTEGER,
+    date_last_inventory TEXT
+  )`);
+});
+
 
 // GET: Retrieve all warranties or check if a specific warranty exists
 export async function GET({ url }) {

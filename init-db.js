@@ -17,7 +17,7 @@ db.serialize(() => {
     )
   `, (err) => {
     if (err) {
-      console.error('Error creating table:', err);
+      console.error('Error creating table:.exit', err);
     } else {
       console.log('Table created successfully.');
     }
