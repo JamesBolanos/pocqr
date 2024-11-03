@@ -5,6 +5,7 @@
   
     let statusMessage = "Ready to take inventory";
     let lastUpdate = null;
+    let action = 'inventory';
     let beep ;
 
   
@@ -37,10 +38,10 @@
   
     async function updateInventory(gtin, serial) {
       try {
-        const response = await fetch('/api/inventory', {
+        const response = await fetch('/api/db', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gtin, serial })
+          body: JSON.stringify({ gtin, serial, action })
         });
   
         const data = await response.json();

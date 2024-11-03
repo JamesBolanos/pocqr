@@ -5,7 +5,7 @@
 
   onMount(async () => {
     try {
-      const response = await fetch('/api/warranties');
+      const response = await fetch('/api/db');
       warranties = await response.json();
     } catch (error) {
       console.error('Error fetching warranties:', error);

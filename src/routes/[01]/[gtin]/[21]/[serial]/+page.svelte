@@ -13,12 +13,13 @@
     let cliente = '';
     let fechaDeCompra = new Date().toISOString().split('T')[0];
     let customer_email = '';
+    let action = 'register_warranty';
   
     // Check if the warranty exists when the component loads
     onMount(async () => {
       try {
         // Fetch from the API to check if the warranty exists
-        const response = await fetch(`/api/warranties?gtin=${gtin}&serial=${serial}`);
+        const response = await fetch(`/api/db?gtin=${gtin}&serial=${serial}`);
         const result = await response.json();
   
         if (result.exists) {
@@ -33,10 +34,10 @@
     // Function to save the warranty
     async function saveWarranty() {
       try {
-        const response = await fetch('/api/warranties', {
+        const response = await fetch('/api/db', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gtin, serial, cliente, fechaDeCompra, customer_email })
+          body: JSON.stringify({ gtin, serial, cliente, fechaDeCompra, customer_email, action })
         });
   
         if (response.ok) {
