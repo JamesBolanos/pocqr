@@ -9,7 +9,7 @@
     <!-- Main Content Area -->
     <main class="flex-grow flex justify-center items-center p-8">
       <div class="w-full max-w-lg bg-white rounded-lg shadow-md p-8">
-        <h2 class="text-2xl font-semibold mb-6 text-center">Main Menu</h2>
+        <h2 class="text-2xl font-semibold mb-6 text-center">Menu Principal</h2>
         <nav class="flex flex-col gap-6">
           <a href="/generacion-codigo-qr" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg text-center shadow-lg transition duration-200">
             Generación de Código QR Powered by GS1 Digital Link

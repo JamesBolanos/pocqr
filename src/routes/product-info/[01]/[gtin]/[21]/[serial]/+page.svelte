@@ -3,6 +3,7 @@
     export let data;
     let gtin = data.gtin;
     let serial = data.serial;
+    import GoBackButton from '$lib/GoBackButton.svelte';
   
     // You can load additional product information here as needed
   </script>
@@ -11,6 +12,11 @@
     <h2 class="text-2xl font-bold mb-4">Product Information</h2>
     <p><strong>GTIN:</strong> {gtin}</p>
     <p><strong>Serial Number:</strong> {serial}</p>
-    <p>Warranty is already registered for this product.</p>
+    <p>La garantia de este producto ya ha sido registrada.</p>
   </div>
   
+  <div>
+
+     <!-- Go Back Button -->
+    <GoBackButton />
+  </div>

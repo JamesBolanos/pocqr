@@ -53,7 +53,7 @@
         Generar Código QR
       </button>
         <!-- Go Back Button -->
-  <GoBackButton />
+       <GoBackButton />
     </form>
   </div>
 

@@ -32,7 +32,7 @@ export async function GET({ url }) {
   if (gtin && serial) {
     return new Promise((resolve, reject) => {
       db.get(
-        `SELECT * FROM warranties WHERE gtin = ? AND serial = ?`,
+        `SELECT * FROM warranties WHERE gtin = ? AND serial = ? AND warranty_registered = 1`,
         [gtin, serial],
         (err, row) => {
           if (err) {
@@ -106,18 +106,40 @@ export async function POST({ request }) {
   } else if (action === 'register_warranty') {
     // Warranty registration logic
     return new Promise((resolve, reject) => {
-      db.run(
-        `INSERT INTO warranties (gtin, serial, cliente, fechaDeCompra, customer_email, warranty_registered) VALUES (?, ?, ?, ?, ?, 1)`,
-        [gtin, serial, cliente, fechaDeCompra, customer_email],
-        function (err) {
-          if (err) {
-            console.error('Database insert error:', err);
-            reject(json({ error: 'Database error' }, { status: 500 }));
-          } else {
-            resolve(json({ success: true, message: 'Warranty registered' }));
-          }
+      db.get(`SELECT * FROM warranties WHERE gtin = ? AND serial = ?`, [gtin, serial], (err, row) => {
+        if (err) {
+          console.error('Database query error:', err);
+          reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
+        } else if (row && row.warranty_registered === 1) {
+          resolve(new Response(JSON.stringify({ message: 'Warranty already registered' }), { status: 200 }));
+        } else if (row && row.warranty_registered === 0) {
+          db.run(
+            `UPDATE warranties SET cliente = ?, fechaDeCompra = ?, customer_email = ?, warranty_registered = 1 WHERE gtin = ? AND serial = ?`,
+            [cliente, fechaDeCompra, customer_email, gtin, serial],
+            function (err) {
+              if (err) {
+                console.error('Database update error:', err);
+                reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
+              } else {
+                resolve(new Response(JSON.stringify({ success: true, message: 'Warranty registered' }), { status: 200 }));
+              }
+            }
+          );
+        } else {
+          db.run(
+            `INSERT INTO warranties (gtin, serial, cliente, fechaDeCompra, customer_email, warranty_registered) VALUES (?, ?, ?, ?, ?, 1)`,
+            [gtin, serial, cliente, fechaDeCompra, customer_email],
+            function (err) {
+              if (err) {
+                console.error('Database insert error:', err);
+                reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
+              } else {
+                resolve(new Response(JSON.stringify({ success: true, message: 'Warranty registered' }), { status: 201 }));
+              }
+            }
+          );
         }
-      );
+      });
     });
   } else {
     return new Response(JSON.stringify({ error: 'Invalid action parameter' }), { status: 400 });
