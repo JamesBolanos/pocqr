@@ -10,7 +10,10 @@ db.serialize(() => {
       gtin TEXT NOT NULL,
       serial TEXT NOT NULL,
       cliente TEXT NOT NULL,
-      fechaDeCompra TEXT NOT NULL
+      fechaDeCompra TEXT NOT NULL,
+      customer_email TEXT,
+      warranty_registered boolean default 0,
+      date_last_inventory text
     )
   `, (err) => {
     if (err) {
