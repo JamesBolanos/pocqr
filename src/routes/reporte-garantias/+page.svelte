@@ -1,0 +1,54 @@
+<script>
+  import { onMount } from 'svelte';
+  import GoBackButton from '$lib/GoBackButton.svelte';
+  let warranties = [];
+
+  onMount(async () => {
+    try {
+      const response = await fetch('/api/warranties');
+      warranties = await response.json();
+    } catch (error) {
+      console.error('Error fetching warranties:', error);
+    }
+  });
+</script>
+
+<div class="max-w-4xl mx-auto p-8">
+  <h2 class="text-2xl font-bold mb-4">Reporte de Garantías</h2>
+
+  {#if warranties.length > 0}
+    <table class="min-w-full bg-white border border-gray-300 mt-4">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="py-2 px-4 border-b text-left">GTIN</th>
+          <th class="py-2 px-4 border-b text-left">Número de Serie</th>
+          <th class="py-2 px-4 border-b text-left">Última Fecha de Inventario</th>
+          <th class="py-2 px-4 border-b text-left">Fecha de Compra</th>
+          <th class="py-2 px-4 border-b text-left">Registro de Garantía</th>
+          <th class="py-2 px-4 border-b text-left">Cliente</th>
+          <th class="py-2 px-4 border-b text-left">Correo Electrónico</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each warranties as warranty}
+          <tr class="hover:bg-gray-50">
+            <td class="py-2 px-4 border-b">{warranty.gtin}</td>
+            <td class="py-2 px-4 border-b">{warranty.serial}</td>
+            <td class="py-2 px-4 border-b">{warranty.date_last_inventory || 'N/A'}</td>
+            <td class="py-2 px-4 border-b">{warranty.fechaDeCompra}</td>
+            <td class="py-2 px-4 border-b">{warranty.warranty_registered ? 'Yes' : 'No'}</td>
+            <td class="py-2 px-4 border-b">{warranty.cliente}</td>
+            <td class="py-2 px-4 border-b">{warranty.customer_email || 'N/A'}</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  {:else}
+    <p class="mt-4">No warranties found.</p>
+  {/if}
+
+   <!-- Go Back Button -->
+   <div class="mt-6">
+    <GoBackButton />
+  </div>
+</div>

@@ -1,59 +1,32 @@
-<script>
-  let domain ='https://resolver-st.gs1.org/';
-  let gtin = '7430042900007';
-  let lotNumber = '';
-  let date = '';
-
-  async function generateQRCode() {
-    const response = await fetch('/generate-qr', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({domain, gtin, lotNumber, date }),
-    });
-
-    const blob = await response.blob();
-
-    const filename = `GTIN_${gtin}_Lote_${lotNumber}_Fecha_${date}.png`;
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    window.URL.revokeObjectURL(url);
-  }
-</script>
-
-<main class="min-h-screen bg-gray-100 flex items-center justify-center">
-  <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
-    <h1 class="text-2xl font-bold mb-6 text-center">Generar Código QR Powered by Digital Link</h1>
-    <h2 class="mb-6 text-center">formato png</h2>
-    
-    <form on:submit|preventDefault={generateQRCode}>
-      <div class="grid grid-cols-1 sm:grid-cols-1 gap-6 mb-6">
-        <div>
-          <label for="domain" class="block text-gray-700 font-medium mb-2">Domain name (default gs1 stage resolver):</label>
-          <input id="domain" type="text" bind:value={domain} maxlength="30" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
-        </div>
-        <div>
-          <label for="gtin" class="block text-gray-700 font-medium mb-2">GTIN (13 caracteres):</label>
-          <input id="gtin" type="text" bind:value={gtin} maxlength="13" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
-        </div>
-        <div>
-          <label for="lotNumber" class="block text-gray-700 font-medium mb-2">Numero de Lote (máx. 20 caracteres):</label>
-          <input id="lotNumber" type="text" bind:value={lotNumber} maxlength="20" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
-        </div>
+<!-- src/routes/+page.svelte -->
+<div class="flex flex-col min-h-screen bg-gray-100">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white py-6 shadow-md">
+      <h1 class="text-3xl font-bold text-center">Proof of Concept</h1>
+      <p class="text-center text-lg mt-2">Improving Warranty Registration and Inventory Management</p>
+    </header>
+  
+    <!-- Main Content Area -->
+    <main class="flex-grow flex justify-center items-center p-8">
+      <div class="w-full max-w-lg bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-2xl font-semibold mb-6 text-center">Main Menu</h2>
+        <nav class="flex flex-col gap-6">
+          <a href="/generacion-codigo-qr" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg text-center shadow-lg transition duration-200">
+            Generación de Código QR Powered by GS1 Digital Link
+          </a>
+          <a href="/escaneo-inventario" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg text-center shadow-lg transition duration-200">
+            Escaneo de Inventario en Display
+          </a>
+          <a href="/reporte-garantias" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg text-center shadow-lg transition duration-200">
+            Reporte de Garantías
+          </a>
+        </nav>
       </div>
-      
-      <div class="mb-6">
-        <label for="date" class="block text-gray-700 font-medium mb-2">Fecha de Expiracion (YYMMDD, 6 caracteres):</label>
-        <input id="date" type="text" bind:value={date} maxlength="6" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
-      </div>
-      
-      <button type="submit" class="w-full bg-blue-500 text-white font-bold py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
-        Generar Código QR
-      </button>
-    </form>
+    </main>
+  
+    <!-- Footer -->
+    <footer class="bg-gray-200 text-gray-700 text-center py-4">
+      © 2023 Your Company
+    </footer>
   </div>
-</main>
+  
