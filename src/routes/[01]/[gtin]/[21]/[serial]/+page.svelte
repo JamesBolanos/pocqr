@@ -11,8 +11,8 @@
   
     // Form fields
     let cliente = '';
-    let fechaDeCompra = new Date().toISOString().split('T')[0];
-    let customer_email = '';
+    let fecha_compra = new Date().toISOString().split('T')[0];
+    let correo = '';
     let action = 'register_warranty';
   
     // Check if the warranty exists when the component loads
@@ -37,7 +37,7 @@
         const response = await fetch('/api/db', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gtin, serial, cliente, fechaDeCompra, customer_email, action })
+          body: JSON.stringify({ gtin, serial, cliente, fecha_compra, correo, action })
         });
   
         if (response.ok) {
@@ -87,13 +87,13 @@
       <!-- Customer Email Field (Optional) -->
       <div class="mb-4">
         <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-        <input id="email" type="email" placeholder="Correo Electrónico" bind:value={customer_email} class="border p-2 rounded w-full" />
+        <input id="email" type="email" placeholder="Correo Electrónico" bind:value={correo} class="border p-2 rounded w-full" />
       </div>
   
       <!-- Purchase Date Field -->
       <div class="mb-4">
-        <label for="fechaDeCompra" class="block text-sm font-medium text-gray-700">Fecha de Compra</label>
-        <input id="fechaDeCompra" type="date" bind:value={fechaDeCompra} class="border p-2 rounded w-full" required />
+        <label for="fecha_compra" class="block text-sm font-medium text-gray-700">Fecha de Compra</label>
+        <input id="fecha_compra" type="date" bind:value={fecha_compra} class="border p-2 rounded w-full" required />
       </div>
   
       <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

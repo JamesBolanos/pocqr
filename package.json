@@ -28,6 +28,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@supabase/supabase-js": "^2.46.1",
 		"canvas-confetti": "^1.9.3",
 		"html5-qrcode": "^2.3.8",
 		"qrcode": "^1.5.4",

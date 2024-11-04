@@ -1,28 +1,9 @@
 // src/routes/api/db/+server.js
-import sqlite3 from 'sqlite3';
+import { supabase } from '$lib/supabaseClient';
 import { json } from '@sveltejs/kit';
 
-const db = new sqlite3.Database(':memory:', (err) => {
-  if (err) {
-    console.error('Error opening database:', err);
-  } else {
-    console.log('Connected to the in-memory SQLite database.');
-  }
-});
-
-// Initialize the warranties table
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS warranties (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    gtin TEXT,
-    serial TEXT,
-    cliente TEXT,
-    fechaDeCompra TEXT,
-    customer_email TEXT,
-    warranty_registered INTEGER,
-    date_last_inventory TEXT
-  )`);
-});
+// Initialize warranties table in Supabase if not done already
+// This would typically be done in the Supabase dashboard directly
 
 // GET: Retrieve all warranties or check if a specific warranty exists
 export async function GET({ url }) {
@@ -30,118 +11,145 @@ export async function GET({ url }) {
   const serial = url.searchParams.get('serial');
 
   if (gtin && serial) {
-    return new Promise((resolve, reject) => {
-      db.get(
-        `SELECT * FROM warranties WHERE gtin = ? AND serial = ? AND warranty_registered = 1`,
-        [gtin, serial],
-        (err, row) => {
-          if (err) {
-            console.error('Database query error:', err);
-            reject(json({ error: 'Database error' }, { status: 500 }));
-          } else {
-            resolve(json({ exists: !!row }));
-          }
-        }
-      );
-    });
+    // Check if a specific warranty exists
+    const { data, error } = await supabase
+      .from('warranties')
+      .select('*')
+      .eq('gtin', gtin)
+      .eq('serial', serial)
+      .eq('garantia_registrada', true);
+      
+
+    if (error) {
+      console.error('Database query error check if a specific warranty exist:', error);
+      return json({ error: 'Database error' }, { status: 500 });
+    }
+
+    const exists = data.length >0;
+
+    
+    return json({ exists });
   } else {
-    return new Promise((resolve, reject) => {
-      db.all(`SELECT * FROM warranties`, (err, rows) => {
-        if (err) {
-          reject(json({ error: 'Database error' }, { status: 500 }));
-        } else {
-          resolve(json(rows));
-        }
-      });
-    });
+    // Retrieve all warranties
+    
+    const { data, error } = await supabase
+      .from('warranties')
+      .select('*');
+
+    if (error) {
+      console.error('Database query error retrieving all warranties:', error);
+      return json({ error: 'Database error' }, { status: 500 });
+    }
+    
+    return json(data);
   }
 }
 
 // POST: Handle both warranty registration and inventory update
 export async function POST({ request }) {
-  const { gtin, serial, cliente, fechaDeCompra, customer_email, action } = await request.json();
+  const { gtin, serial, cliente, fecha_compra, correo, action } = await request.json();
 
   if (!gtin || !serial) {
-    return new Response(JSON.stringify({ error: 'GTIN and Serial are required' }), { status: 400 });
+    console.error('Missing GTIN or Serial in request');
+    return json({ error: 'GTIN and Serial are required' }, { status: 400 });
   }
 
   if (action === 'inventory') {
-    // Inventory update logic
-    const date_last_inventory = new Date().toISOString();
+    const fecha_inventario = new Date().toISOString();
 
-    return new Promise((resolve, reject) => {
-      db.get(`SELECT * FROM warranties WHERE gtin = ? AND serial = ?`, [gtin, serial], (err, row) => {
-        if (err) {
-          console.error('Database query error:', err);
-          reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
-        } else if (row) {
-          db.run(
-            `UPDATE warranties SET date_last_inventory = ? WHERE gtin = ? AND serial = ?`,
-            [date_last_inventory, gtin, serial],
-            function (err) {
-              if (err) {
-                console.error('Database update error:', err);
-                reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
-              } else {
-                resolve(new Response(JSON.stringify({ message: 'Inventory date updated', date_last_inventory, gtin, serial }), { status: 200 }));
-              }
-            }
-          );
-        } else {
-          db.run(
-            `INSERT INTO warranties (gtin, serial, date_last_inventory, warranty_registered) VALUES (?, ?, ?, 0)`,
-            [gtin, serial, date_last_inventory],
-            function (err) {
-              if (err) {
-                console.error('Database insert error:', err);
-                reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
-              } else {
-                resolve(new Response(JSON.stringify({ message: 'New inventory record added', date_last_inventory, gtin, serial }), { status: 201 }));
-              }
-            }
-          );
-        }
-      });
-    });
+    // Check if the item exists and update or insert inventory record
+    const { data: existingRecord, error: fetchError } = await supabase
+      .from('warranties')
+      .select('*')
+      .eq('gtin', gtin)
+      .eq('serial', serial);
+      
+
+    if (fetchError) {
+      console.error('Database query error on inventory check:', fetchError);
+      return json({ error: 'Database error' }, { status: 500 });
+    }
+
+    if (existingRecord) {
+      // Update existing record
+
+      const { error: updateError } = await supabase
+        .from('warranties')
+        .update({ fecha_inventario })
+        .eq('gtin', gtin)
+        .eq('serial', serial);
+
+      if (updateError) {
+        console.error('Database update error:', updateError);
+        return json({ error: 'Database error' }, { status: 500 });
+      }
+
+      return json({ message: 'Inventory date updated', fecha_inventario, gtin, serial });
+    } else {
+      // Insert new inventory record
+      const { error: insertError } = await supabase
+        .from('warranties')
+        .insert({ gtin, serial, fecha_inventario, garantia_registrada: false });
+
+      if (insertError) {
+        console.error('Database insert error:', insertError);
+        return json({ error: 'Database error' }, { status: 500 });
+      }
+
+      return json({ message: 'New inventory record added', fecha_inventario, gtin, serial });
+    }
   } else if (action === 'register_warranty') {
-    // Warranty registration logic
-    return new Promise((resolve, reject) => {
-      db.get(`SELECT * FROM warranties WHERE gtin = ? AND serial = ?`, [gtin, serial], (err, row) => {
-        if (err) {
-          console.error('Database query error:', err);
-          reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
-        } else if (row && row.warranty_registered === 1) {
-          resolve(new Response(JSON.stringify({ message: 'Warranty already registered' }), { status: 200 }));
-        } else if (row && row.warranty_registered === 0) {
-          db.run(
-            `UPDATE warranties SET cliente = ?, fechaDeCompra = ?, customer_email = ?, warranty_registered = 1 WHERE gtin = ? AND serial = ?`,
-            [cliente, fechaDeCompra, customer_email, gtin, serial],
-            function (err) {
-              if (err) {
-                console.error('Database update error:', err);
-                reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
-              } else {
-                resolve(new Response(JSON.stringify({ success: true, message: 'Warranty registered' }), { status: 200 }));
-              }
-            }
-          );
-        } else {
-          db.run(
-            `INSERT INTO warranties (gtin, serial, cliente, fechaDeCompra, customer_email, warranty_registered) VALUES (?, ?, ?, ?, ?, 1)`,
-            [gtin, serial, cliente, fechaDeCompra, customer_email],
-            function (err) {
-              if (err) {
-                console.error('Database insert error:', err);
-                reject(new Response(JSON.stringify({ error: 'Database error' }), { status: 500 }));
-              } else {
-                resolve(new Response(JSON.stringify({ success: true, message: 'Warranty registered' }), { status: 201 }));
-              }
-            }
-          );
-        }
-      });
-    });
+    // Check if warranty is already registered
+    const { data: existingWarranty, error: warrantyFetchError } = await supabase
+      .from('warranties')
+      .select('*')
+      .eq('gtin', gtin)
+      .eq('serial', serial);
+
+    if (warrantyFetchError) {
+      console.error('Database query error on warranty check:', warrantyFetchError);
+      return json({ error: 'Database error' }, { status: 500 });
+    }
+
+    //here existingWarranty should be false but is true even if there is no record
+    const recordExists = existingWarranty.length >0;
+
+    console.log(`Warranty already exists to update?: ${recordExists}`);
+    
+
+    if (recordExists && existingWarranty.garantia_registrada) {
+      console.log('Warranty already registered');
+      return json({ message: 'Warranty already registered' });
+    } else if (recordExists && !existingWarranty.garantia_registrada) {
+      console.log("paso por aqui asomandome");
+      // Update existing record with warranty information
+      const { error: updateWarrantyError } = await supabase
+        .from('warranties')
+        .update({ cliente, fecha_compra, correo, garantia_registrada: true })
+        .eq('gtin', gtin)
+        .eq('serial', serial);
+
+      if (updateWarrantyError) {
+        console.error('Database update error:', updateWarrantyError);
+        return json({ error: 'Database error' }, { status: 500 });
+      }
+
+      return json({ success: true, message: 'Warranty registered' });
+    } else {
+      // Insert new warranty record
+      const { error: insertWarrantyError } = await supabase
+        .from('warranties')
+        .insert({ gtin, serial, cliente, fecha_compra, correo, garantia_registrada: true });
+
+      if (insertWarrantyError) {
+        console.error('Database insert error:', insertWarrantyError);
+        return json({ error: 'Database error' }, { status: 500 });
+      }
+      console.log('New warranty record added successfully');
+      return json({ success: true, message: 'Warranty registered' });
+    }
   } else {
-    return new Response(JSON.stringify({ error: 'Invalid action parameter' }), { status: 400 });
+    console.error('Invalid action parameter');
+    return json({ error: 'Invalid action parameter' }, { status: 400 });
   }
 }
