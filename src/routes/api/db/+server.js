@@ -64,14 +64,21 @@ export async function POST({ request }) {
       .eq('gtin', gtin)
       .eq('serial', serial);
       
+    console.log('checking if the item exists');
 
     if (fetchError) {
       console.error('Database query error on inventory check:', fetchError);
       return json({ error: 'Database error' }, { status: 500 });
     }
 
-    if (existingRecord) {
+    //This is because the object existingRecord always is true even if there is no rows on the database
+    const existInventoryRecord = existingRecord.length > 0;
+
+
+    if (existInventoryRecord) {
       // Update existing record
+
+      console.log('supposedly the item exists..');
 
       const { error: updateError } = await supabase
         .from('warranties')

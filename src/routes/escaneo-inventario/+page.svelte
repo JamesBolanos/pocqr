@@ -10,29 +10,30 @@
 
   
     function onScanSuccess(decodedText) {
-  
-  
-  try {
-    // Parse the URL directly to extract GTIN and Serial
-    const pathParts = decodedText.split('/');
-    const gtinIndex = pathParts.indexOf('01') + 1;
-    const serialIndex = pathParts.indexOf('21') + 1;
+      console.log("QR Code scanned:", decodedText)
+      try {
+        // Parse the URL directly to extract GTIN and Serial
+        const pathParts = decodedText.split('/');
+        const gtinIndex = pathParts.indexOf('01') + 1;
+        const serialIndex = pathParts.indexOf('21') + 1;
 
-    const gtin = pathParts[gtinIndex] || null;
-    const serial = pathParts[serialIndex] || null;
+        const gtin = pathParts[gtinIndex] || null;
+        const serial = pathParts[serialIndex] || null;
 
-    if (gtin && serial) {
-      updateInventory(gtin, serial);
-    } else {
-      statusMessage = 'Failed to extract GTIN and Serial from QR code.';
+        if (gtin && serial) {
+          
+          updateInventory(gtin, serial);
+        } else {
+          statusMessage = 'Failed to extract GTIN and Serial from QR code.';
+        }
+        
+      } catch (error) {
+        console.error("Error parsing QR code:", error);
+        statusMessage = 'Invalid QR code format.';
+      }
+
+      if (beep) beep.play();
     }
-  } catch (error) {
-    console.error("Error parsing QR code:", error);
-    statusMessage = 'Invalid QR code format.';
-  }
-
-  if (beep) beep.play();
-}
 
 
   
@@ -66,6 +67,7 @@
     }
   
     onMount(() => {
+      
       beep = new Audio('/store-scanner-beep-90395.mp3'); // Load the beep sound file
       const qrCodeScanner = new Html5Qrcode("qr-reader");
       qrCodeScanner.start(
