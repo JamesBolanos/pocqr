@@ -10,39 +10,45 @@
 
   
     function onScanSuccess(decodedText) {
-      console.log("QR Code scanned:", decodedText)
-      try {
-        // Parse the URL directly to extract GTIN and Serial
-        const pathParts = decodedText.split('/');
-        const gtinIndex = pathParts.indexOf('01') + 1;
-        const serialIndex = pathParts.indexOf('21') + 1;
+  console.log("QR Code scanned:", decodedText);
+  try {
+    // Parse the URL to extract the domain, GTIN, and Serial
+    const pathParts = decodedText.split('/');
 
-        const gtin = pathParts[gtinIndex] || null;
-        const serial = pathParts[serialIndex] || null;
+    // Extract the domain name from the first part of the URL
+    const domain = pathParts[0] + "//" + pathParts[2];
+    console.log("Domain:", domain);
 
-        if (gtin && serial) {
-          
-          updateInventory(gtin, serial);
-        } else {
-          statusMessage = 'Failed to extract GTIN and Serial from QR code.';
-        }
-        
-      } catch (error) {
-        console.error("Error parsing QR code:", error);
-        statusMessage = 'Invalid QR code format.';
-      }
+    // Locate and extract GTIN and Serial based on GS1 identifiers (01 for GTIN, 21 for Serial)
+    const gtinIndex = pathParts.indexOf('01') + 1;
+    const serialIndex = pathParts.indexOf('21') + 1;
 
-      if (beep) beep.play();
+    const gtin = pathParts[gtinIndex] || null;
+    const serial = pathParts[serialIndex] || null;
+
+    if (gtin && serial) {
+      console.log("GTIN:", gtin, "Serial:", serial);
+      updateInventory(domain, gtin, serial);
+    } else {
+      statusMessage = 'Failed to extract GTIN and Serial from QR code.';
     }
+    
+  } catch (error) {
+    console.error("Error parsing QR code:", error);
+    statusMessage = 'Invalid QR code format.';
+  }
+
+  if (beep) beep.play();
+}
 
 
   
-    async function updateInventory(gtin, serial) {
+    async function updateInventory(domain, gtin, serial) {
       try {
         const response = await fetch('/api/db', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gtin, serial, action })
+          body: JSON.stringify({ domain, gtin, serial, action })
         });
   
         const data = await response.json();
@@ -52,6 +58,7 @@
           lastUpdate = {
             date: timestamp.toLocaleDateString(),
             time: timestamp.toLocaleTimeString(),
+            domain,
             gtin,
             serial,
             message: data.message
@@ -86,6 +93,7 @@
     <ul>
       <li>Date: {lastUpdate.date}</li>
       <li>Time: {lastUpdate.time}</li>
+      <li>Domain: {lastUpdate.time}</li>
       <li>GTIN: {lastUpdate.gtin}</li>
       <li>Serial: {lastUpdate.serial}</li>
       <li>Status: {lastUpdate.message}</li>

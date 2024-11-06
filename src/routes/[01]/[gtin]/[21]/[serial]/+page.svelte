@@ -6,8 +6,18 @@
     import confetti from 'canvas-confetti';
   
     // Access URL parameters
+    let domain;
     let gtin = get(page).params.gtin;
     let serial = get(page).params.serial;
+
+
+    // Extract the domain
+    domain = get(page).url.origin;
+
+    // for debug purposes
+    console.log("Domain:", domain);
+    console.log("GTIN:", gtin);
+    console.log("Serial:", serial);
   
     // Form fields
     let cliente = '';
@@ -19,7 +29,7 @@
     onMount(async () => {
       try {
         // Fetch from the API to check if the warranty exists
-        const response = await fetch(`/api/db?gtin=${gtin}&serial=${serial}`);
+        const response = await fetch(`/api/db?domain=${domain}&gtin=${gtin}&serial=${serial}`);
         const result = await response.json();
   
         if (result.exists) {
@@ -37,7 +47,7 @@
         const response = await fetch('/api/db', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gtin, serial, cliente, fecha_compra, correo, action })
+          body: JSON.stringify({ domain, gtin, serial, cliente, fecha_compra, correo, action })
         });
   
         if (response.ok) {

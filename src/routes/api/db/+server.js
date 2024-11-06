@@ -7,6 +7,7 @@ import { json } from '@sveltejs/kit';
 
 // GET: Retrieve all warranties or check if a specific warranty exists
 export async function GET({ url }) {
+  const domain = url.searchParams.get('domain');
   const gtin = url.searchParams.get('gtin');
   const serial = url.searchParams.get('serial');
 
@@ -15,6 +16,7 @@ export async function GET({ url }) {
     const { data, error } = await supabase
       .from('warranties')
       .select('*')
+      .eq('domain', domain)
       .eq('gtin', gtin)
       .eq('serial', serial)
       .eq('garantia_registrada', true);
@@ -45,22 +47,68 @@ export async function GET({ url }) {
   }
 }
 
-// POST: Handle both warranty registration and inventory update
+// POST: Handle qr code creation (new item), warranty registration and inventory update.
 export async function POST({ request }) {
-  const { gtin, serial, cliente, fecha_compra, correo, action } = await request.json();
+  const { domain, gtin, serial, cliente, fecha_compra, correo, action } = await request.json();
 
   if (!gtin || !serial) {
+    console.log(gtin);
+    console.log(serial);
     console.error('Missing GTIN or Serial in request');
     return json({ error: 'GTIN and Serial are required' }, { status: 400 });
   }
+  //////////////////////////////////////////////////////////////////////
+  if (action === 'create_new') {
+    const fecha_ingreso = new Date().toISOString(); 
 
-  if (action === 'inventory') {
+    // Check if the item exists.
+    const { data: existingRecord, error: fetchError } = await supabase
+      .from('warranties')
+      .select('*')
+      .eq('domain',domain)
+      .eq('gtin', gtin)
+      .eq('serial', serial);
+      
+    console.log('checking if the item exists...');
+
+    if (fetchError) {
+      console.error('Database query error on inventory check:', fetchError);
+      return json({ error: 'Database error' }, { status: 500 });
+    }
+
+    //This is because the object existingRecord always is true even if there is no rows on the database
+    
+    const existInventoryRecord = existingRecord.length > 0;
+
+    if (existInventoryRecord) {
+      // Log the error 
+
+      console.log('the create_new action is trying to add an item that already exists...');
+      return json({ message: 'The item already exists in the table', domain, gtin, serial });
+    } else {
+      // Insert new record
+      //TODO: YOU HAVE TO INSERT A CREATION DATE.
+      const { error: insertError } = await supabase
+        .from('warranties')
+        .insert({ domain, gtin, serial, fecha_ingreso, garantia_registrada: false });
+
+      if (insertError) {
+        console.error('Database insert error:', insertError);
+        return json({ error: 'Database error' }, { status: 500 });
+      }
+
+      return json({ message: 'New record added', domain, gtin, serial });
+    }
+    ///////////////////////////////////////
+
+  } else if (action === 'inventory') {
     const fecha_inventario = new Date().toISOString();
 
     // Check if the item exists and update or insert inventory record
     const { data: existingRecord, error: fetchError } = await supabase
       .from('warranties')
       .select('*')
+      .eq('domain',domain)
       .eq('gtin', gtin)
       .eq('serial', serial);
       
@@ -83,6 +131,7 @@ export async function POST({ request }) {
       const { error: updateError } = await supabase
         .from('warranties')
         .update({ fecha_inventario })
+        .eq('domain', domain)
         .eq('gtin', gtin)
         .eq('serial', serial);
 
@@ -94,9 +143,10 @@ export async function POST({ request }) {
       return json({ message: 'Inventory date updated', fecha_inventario, gtin, serial });
     } else {
       // Insert new inventory record
+      // THIS WILL NOT BE POSSIBLE YOU NEED TO DOBULE CHECK THE FLOW
       const { error: insertError } = await supabase
         .from('warranties')
-        .insert({ gtin, serial, fecha_inventario, garantia_registrada: false });
+        .insert({ domain, gtin, serial, fecha_inventario, garantia_registrada: false });
 
       if (insertError) {
         console.error('Database insert error:', insertError);
@@ -110,6 +160,7 @@ export async function POST({ request }) {
     const { data: existingWarranty, error: warrantyFetchError } = await supabase
       .from('warranties')
       .select('*')
+      .eq('domain',domain)
       .eq('gtin', gtin)
       .eq('serial', serial);
 
@@ -128,11 +179,13 @@ export async function POST({ request }) {
       console.log('Warranty already registered');
       return json({ message: 'Warranty already registered' });
     } else if (recordExists && !existingWarranty.garantia_registrada) {
-      console.log("paso por aqui asomandome");
-      // Update existing record with warranty information
+      
+      // Update record with warranty information
+
       const { error: updateWarrantyError } = await supabase
         .from('warranties')
         .update({ cliente, fecha_compra, correo, garantia_registrada: true })
+        .eq('domain',domain)
         .eq('gtin', gtin)
         .eq('serial', serial);
 
@@ -144,9 +197,10 @@ export async function POST({ request }) {
       return json({ success: true, message: 'Warranty registered' });
     } else {
       // Insert new warranty record
+      // this code will be eliminated because the flow now creates a new record when creating the qr code
       const { error: insertWarrantyError } = await supabase
         .from('warranties')
-        .insert({ gtin, serial, cliente, fecha_compra, correo, garantia_registrada: true });
+        .insert({ domain, gtin, serial, cliente, fecha_compra, correo, garantia_registrada: true });
 
       if (insertWarrantyError) {
         console.error('Database insert error:', insertWarrantyError);

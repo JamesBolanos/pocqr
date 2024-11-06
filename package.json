@@ -1,5 +1,5 @@
 {
-	"name": "POCQR",
+	"name": "pocqr",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -31,7 +31,6 @@
 		"@supabase/supabase-js": "^2.46.1",
 		"canvas-confetti": "^1.9.3",
 		"html5-qrcode": "^2.3.8",
-		"qrcode": "^1.5.4",
-		"sqlite3": "^5.1.7"
+		"qrcode": "^1.5.4"
 	}
 }
