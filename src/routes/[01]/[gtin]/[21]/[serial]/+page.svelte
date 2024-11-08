@@ -14,10 +14,10 @@
     // Extract the domain
     domain = get(page).url.origin;
 
-    // for debug purposes
-    console.log("Domain:", domain);
-    console.log("GTIN:", gtin);
-    console.log("Serial:", serial);
+    //for debug purposes
+    //console.log("Domain:", domain);
+    //console.log("GTIN:", gtin);
+    //console.log("Serial:", serial);
   
     // Form fields
     let cliente = '';
@@ -42,7 +42,18 @@
     });
   
     // Function to save the warranty
+
+
     async function saveWarranty() {
+
+      // Trigger confetti animation. this should go before the alert, but because saveWarranty is async() first shows the alert, and the confetti is shown after the redirection
+      // There msust be a better place to put this animation.
+      confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+      });
+
       try {
         const response = await fetch('/api/db', {
           method: 'POST',
@@ -51,12 +62,7 @@
         });
   
         if (response.ok) {
-          // Trigger confetti animation
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 }
-          });
+          
           alert('Garantia registrada correctamente!');
         } else {
           alert('Fallo al registrar la garantia.');

@@ -11,6 +11,6 @@
     on:click={goBack}
     class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
   >
-    Go Back to Main Menu
+    Regresar al Menu Principal de la DEMO
   </button>
   

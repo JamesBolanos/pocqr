@@ -59,7 +59,7 @@
     <h1 class="text-2xl font-bold mb-6 text-center">Generación de Código QR Powered by GS1 Digital Link</h1>
     <h2 class="mb-6 text-center">formato png</h2>
     
-    <form on:submit|preventDefault={generateQRCode}>
+    <form>
       <div class="grid grid-cols-1 sm:grid-cols-1 gap-6 mb-6">
         <div>
           <label for="domain" class="block text-gray-700 font-medium mb-2">Dominio:</label>
@@ -77,15 +77,12 @@
      
 
       
-      <button type="submit" class="w-full bg-blue-500 text-white font-bold py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+      <button type="button" on:click={generateQRCode} class="w-full bg-blue-500 text-white font-bold py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
         Generar Código QR
       </button>
-  
-
-        <!-- Go Back Button -->
-       <GoBackButton />
     </form>
+    <!-- Go Back Button -->
+    <GoBackButton />
   </div>
-
 
 </main>

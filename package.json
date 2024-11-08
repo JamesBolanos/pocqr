@@ -10,8 +10,8 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.0.0",
-		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/adapter-auto": "^3.3.1",
+		"@sveltejs/kit": "^2.7.7",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "^9.6.0",
 		"autoprefixer": "^10.4.20",
@@ -29,6 +29,7 @@
 	"type": "module",
 	"dependencies": {
 		"@supabase/supabase-js": "^2.46.1",
+		"@vercel/speed-insights": "^1.1.0",
 		"canvas-confetti": "^1.9.3",
 		"html5-qrcode": "^2.3.8",
 		"qrcode": "^1.5.4"
