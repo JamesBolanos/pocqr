@@ -7,13 +7,16 @@
   let action = 'create_new';
   
   async function generateQRCode() {
-    const response = await fetch('/generate-qr', {
+    const response = await fetch('/api/generate-qr', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({domain, gtin, serial }),
     });
+
+    console.log(JSON.stringify({domain, gtin,serial}));
+
 
     const blob = await response.blob();
     const filename = `GTIN_${gtin}_Serial_${serial}.png`;
@@ -70,8 +73,8 @@
           <input id="gtin" type="text" bind:value={gtin} maxlength="13" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
         </div>
         <div>
-          <label for="serialNumber" class="block text-gray-700 font-medium mb-2">Numero de serie:</label>
-          <input id="serialNumber" type="text" bind:value={serial} maxlength="20" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
+          <label for="serial" class="block text-gray-700 font-medium mb-2">Numero de serie:</label>
+          <input id="serial" type="text" bind:value={serial} maxlength="20" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
         </div>
       </div>
      

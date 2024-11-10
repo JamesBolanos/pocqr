@@ -1,7 +1,7 @@
 import QRCode from 'qrcode';
 
 export async function POST({ request }) {
-  const { domain, gtin, serialNumber } = await request.json();
+  const { domain, gtin, serial } = await request.json();
 
   // Validate GTIN length
   if (gtin.length !== 13) {
@@ -9,10 +9,10 @@ export async function POST({ request }) {
   }
 
   // Generate the data string following GS1 standards
-  const qrData = `${domain}01/${gtin}/21/${serialNumber}`; 
+  const qrData = `${domain}01/${gtin}/21/${serial}`; 
 
   // Create a dynamic filename based on the input values
-  const filename = `GTIN_${gtin}_Serial_${serialNumber}.png`;
+  const filename = `GTIN_${gtin}_Serial_${serial}.png`;
 
   // Generate QR code as a PNG buffer
   const qrCodeImage = await QRCode.toBuffer(qrData, { type: 'png' });
