@@ -1,38 +1,49 @@
-# create-svelte
+# Project Overview
+> "This project is a proof of concept for a warranty registration system that utilizes 2D barcodes (QR codes) to streamline the process. It allows for easy scanning, automatic data entry, and secure storage of warranty information, improving customer experience and simplifying warranty management."
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+## Key Features
 
-## Creating a project
+- **QR Code Scanning:** Customers or sales reps can scan QR codes for easy registration and inventory tracking.
+- **Warranty Registration:** Automatically populates warranty forms with data embedded in the barcode.
+- **Inventory Management:** Enables tracking of products in real-time to ensure accurate warranty and stock data.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Technology Stack
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- **Frontend:** SvelteKit, Tailwind CSS
+- **Backend:** Node.js, Supabase
+- **Deployment:** Vercel
+- **Barcode Standards:** GS1 Digital Link Standard for QR code generation
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## Installation and Setup
+Include a step-by-step guide on how to set up the project locally, including:
+1. **Cloning the repository**
+2. **Installing dependencies**
+3. **Running the application** (e.g., `npm run dev`)
 
-## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Usage Instructions
 
-```bash
-npm run dev
+- **Scanning a QR code** to register a warranty
+- **Accessing the reporting and inventory features**
+- **Viewing or editing warranty records**
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## System Architecture
 
-## Building
+- REST
 
-To create a production version of your app:
+## Known Issues & Limitations
 
-```bash
-npm run build
-```
+- This is only a proof of concept
 
-You can preview the production build with `npm run preview`.
+## Future Enhancements
+-  Better report format
+-  Public API Availability ( for Power BI)
+-  Possible use of Express
+-  Implement Security
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Contribution Guidelines
+
+-   Contributors are welcome
+
+## License
+- No license.

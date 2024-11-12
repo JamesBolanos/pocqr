@@ -1,6 +1,6 @@
-// src/routes/product-info/[01]/[gtin]/[21]/[serial]/+page.js
+// src/routes/product-info/[01]/[gtin]/[21]/[serie]/+page.js
 export function load({ params }) {
-    const { gtin, serial } = params;
-    return { gtin, serial };
+    const { gtin, serie } = params;
+    return { gtin, serie };
   }
   

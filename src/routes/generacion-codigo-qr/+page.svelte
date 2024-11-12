@@ -2,8 +2,9 @@
 
   import GoBackButton from '$lib/GoBackButton.svelte';
   let domain ='https://poqr.vercel.app/';
-  let gtin = '7430042900007';
-  let serial = '';
+  let gtin = '7430042900007'; //GS1 AI 01 GTIN 13
+  let serie = ''; //GS1 AI (21) 
+  let fecha_produccion = '';  //GS1 AI (11) FORMAT YYMMDD
   let action = 'create_new';
   
   async function generateQRCode() {
@@ -12,14 +13,16 @@
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({domain, gtin, serial }),
+      body: JSON.stringify({domain, gtin, serie, fecha_produccion }),
     });
 
-    console.log(JSON.stringify({domain, gtin,serial}));
+    //DEBUG
+    console.log(JSON.stringify({domain, gtin, serie, fecha_produccion}));
+    //DEBUG
 
 
     const blob = await response.blob();
-    const filename = `GTIN_${gtin}_Serial_${serial}.png`;
+    const filename = `GTIN_${gtin}_SERIE_${serie}_FECHAP_${fecha_produccion}.png`;
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -37,17 +40,22 @@
         const response = await fetch('/api/db', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ domain, gtin, serial, action })
+          body: JSON.stringify({ domain, gtin, serie, fecha_produccion, action })
         });
   
         const data = await response.json();
   
         if (response.ok) {
+
+          //DEBUG
           console.log('new record added');
+          //DEBUG
           
           
         } else {
+          //DEBUG
           console.log('Post response was not ok');
+          //DEBUG
         }
 
       } catch (error) {
@@ -73,12 +81,16 @@
           <input id="gtin" type="text" bind:value={gtin} maxlength="13" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
         </div>
         <div>
-          <label for="serial" class="block text-gray-700 font-medium mb-2">Numero de serie:</label>
-          <input id="serial" type="text" bind:value={serial} maxlength="20" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
+          <label for="serie" class="block text-gray-700 font-medium mb-2">Numero de serie:</label>
+          <input id="serie" type="text" bind:value={serie} maxlength="20" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
         </div>
+        <div>
+          <label for="fecha_produccion" class="block text-gray-700 font-medium mb-2">Fecha de Produccion (AAMMDD):</label>
+          <input id="fecha_produccion" type="text" bind:value={fecha_produccion} maxlength="20" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" required />
+        </div>
+
       </div>
      
-
       
       <button type="button" on:click={generateQRCode} class="w-full bg-blue-500 text-white font-bold py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
         Generar Código QR

@@ -12,25 +12,25 @@
     function onScanSuccess(decodedText) {
   console.log("QR Code scanned:", decodedText);
   try {
-    // Parse the URL to extract the domain, GTIN, and Serial
+    // Parse the URL to extract the domain, GTIN, and serie
     const pathParts = decodedText.split('/');
 
     // Extract the domain name from the first part of the URL
     const domain = pathParts[0] + "//" + pathParts[2];
     console.log("Domain:", domain);
 
-    // Locate and extract GTIN and Serial based on GS1 identifiers (01 for GTIN, 21 for Serial)
+    // Locate and extract GTIN and serie based on GS1 identifiers (01 for GTIN, 21 for serie)
     const gtinIndex = pathParts.indexOf('01') + 1;
-    const serialIndex = pathParts.indexOf('21') + 1;
+    const serieIndex = pathParts.indexOf('21') + 1;
 
     const gtin = pathParts[gtinIndex] || null;
-    const serial = pathParts[serialIndex] || null;
+    const serie = pathParts[serieIndex] || null;
 
-    if (gtin && serial) {
-      console.log("GTIN:", gtin, "Serial:", serial);
-      updateInventory(domain, gtin, serial);
+    if (gtin && serie) {
+      console.log("GTIN:", gtin, "serie:", serie);
+      updateInventory(domain, gtin, serie);
     } else {
-      statusMessage = 'Failed to extract GTIN and Serial from QR code.';
+      statusMessage = 'Failed to extract GTIN and serie from QR code.';
     }
     
   } catch (error) {
@@ -43,12 +43,12 @@
 
 
   
-    async function updateInventory(domain, gtin, serial) {
+    async function updateInventory(domain, gtin, serie) {
       try {
         const response = await fetch('/api/db', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ domain, gtin, serial, action })
+          body: JSON.stringify({ domain, gtin, serie, action })
         });
   
         const data = await response.json();
@@ -60,7 +60,7 @@
             time: timestamp.toLocaleTimeString(),
             domain,
             gtin,
-            serial,
+            serie,
             message: data.message
           };
           statusMessage = `Last item updated at ${lastUpdate.date} ${lastUpdate.time}`;
@@ -95,7 +95,7 @@
       <li>Time: {lastUpdate.time}</li>
       <li>Domain: {lastUpdate.time}</li>
       <li>GTIN: {lastUpdate.gtin}</li>
-      <li>Serial: {lastUpdate.serial}</li>
+      <li>serie: {lastUpdate.serie}</li>
       <li>Status: {lastUpdate.message}</li>
     </ul>
   {/if}
